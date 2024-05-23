@@ -41,7 +41,14 @@ if __name__ == '__main__' :
     read_file = open('periodic_table.txt', 'r');
     output_file = open('periodic_table.html', 'w')
     dictionaire = build_dectionary(read_file);
-    output_file.write('<table>\n')
+    output_file.write('<!DOCTYPE html>\n\
+<html lang="en">\n\
+    <head lang="en">\n\
+        <meta charset="UTF-8">\n\
+        <title>Periodic Table</title>\n\
+    </head>\n\
+    <body>\n\
+        <table>\n')
     for key, value in dictionaire.items():
         name = value.get('name')
         number = value.get('number')
@@ -53,32 +60,28 @@ if __name__ == '__main__' :
         beginn = "<tr>\n" if value.get('position') == '0' else ""
         endd = "</tr>\n" if value.get('position') == '17' else ""
         if (int(position) > prevPos + 1 and not beginn):
-            print(prevPos + 1, int(position))
             for i in range(int(position) - prevPos - 1):
-                output_file.write(f'\
-    <td style="border: 1px solid black; padding:10px">\n\
-        <h4></h4>\n\
-        <ul>\n\
-        </ul>\n\
-    </td>\n\
-            ')
+                output_file.write('\
+            <td style="border: 1px solid black; padding:10px">\n\
+            </td>\n')
             pass;
         output_file.write(f'\
-    '+beginn+'\n\
-    <td style="border: 1px solid black; padding:10px">\n\
-        <h4>'+ name +'</h4>\n\
-        <ul>\n\
-            <li>No '+ number+  '</li>\n\
-            <li>'+ small+  '</li>\n\
-            <li>'+ molar+  '</li>\n\
-            <li>'+ electron+  'electron</li>\n\
-        </ul>\n\
-    </td>\n\
-    '+endd+'\
-            ')
+            '+beginn+'\n\
+            <td style="border: 1px solid black; padding:10px">\n\
+                <h4>'+ name +'</h4>\n\
+                <ul>\n\
+                    <li>No '+ number+  '</li>\n\
+                    <li>'+ small+  '</li>\n\
+                    <li>'+ molar+  '</li>\n\
+                    <li>'+ electron+  'electron</li>\n\
+                </ul>\n\
+            </td>\n\
+            '+endd+'\n')
         prevPos = int(value.get('position'))
         pass
-    output_file.write('</table>')
+    output_file.write('\t\t</table>\n')
+    output_file.write('\t</body>\n')
+    output_file.write('</html>\n');
     output_file.close();
     read_file.close();
     
