@@ -123,11 +123,11 @@ def last_test():
 
 def test():
     test_text()
-    # test_elem_basics()
-    # test_embedding()
-    # test_empty_texts()
-    # test_errors()
-    # last_test()
+    test_elem_basics()
+    test_embedding()
+    test_empty_texts()
+    test_errors()
+    last_test()
     
 if __name__ == '__main__':
     try :

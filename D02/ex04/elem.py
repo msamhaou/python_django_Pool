@@ -12,10 +12,25 @@ class Text(str):
 
 level = 0;
 class Elem(object):
-    def __init__(self, tag="div", attr={}, content=None, type="double"):
-        print(self.__class__, id(self))
+    def __init__(self, tag="div", attr={}, content=None, tag_type="double"):
         self.lvl = 0;
+        self.tag = tag;
+        self.newline = 0;
+        self.tag_type = tag_type;
         self.setup(content);
+        if isinstance(self.content[0], Elem):
+            self.set_level(self.lvl + 1);
+        # if isinstance(self.content[0], (Elem, Text)):
+        #     self.isInline(self.content[0])
+        
+            
+    def isInline(self, content):
+        if content:
+            self.newline = 1;
+            if isinstance(content, Elem) and content.content:
+                self.content.isInline()
+
+        
 
     def setup(self, content):
         if not isinstance(content, (None.__class__, list, Elem, Text)):
@@ -27,24 +42,32 @@ class Elem(object):
         else:
             self.content = [content];
     
-    def __str__(self):
-        self.set_levels(0);
-        return "";
-    
-    def set_levels(self, lvl):
-        print("call")
-        global level;
-        for cc in self.content:
-            if isinstance(cc, Elem):
-                level += 1
-                cc.lvl = level
-            if cc and isinstance(cc.content[0], Elem):
-                cc.content[0].set_levels(cc.lvl);
-            
+    def set_level(self, lvl):
+        for elem in self.content:
+            elem.lvl = lvl;
+            if elem.content and isinstance(elem.content[0], Elem):
+                elem.set_level(elem.lvl + 1)
         pass;
+    
+    def open_tag(self):
+        str = "%s<%s>%s" % ((self.lvl) * "  ", self.tag, self.newline * '\n');
+        return str
 
-obj = Elem(content=Elem(content=Elem(content=Elem(content=Elem(content=Elem())))));
-str = obj.__str__();
-print(obj.lvl)
-print(level)
+    def generate_content(self):
+        str = ""
+        for elem in self.content:
+            if elem:
+                if isinstance(elem , Text):
+                    str += "%s%s\n" % ((self.lvl + 1 ) * "  ", elem);
+                else:
+                    str += elem.__str__();
+        return str;
+        
+    def __str__(self):
+        str = "";
+        str += self.open_tag()
+        str += self.generate_content()
+        str += "%s</%s>%s" % (self.newline * self.lvl * "  ", self.tag, int(0 if self.lvl == 0 else 1) * '\n')
+        return str;
 
+print(str(Elem(content=[Text('foo'), Text('bar'), Elem()])) )
