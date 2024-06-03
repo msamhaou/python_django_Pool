@@ -1,73 +1,116 @@
+#!/usr/bin/python3
+
 class Text(str):
-    def __init__(self, txt=""):
-        self.txt = txt;
-        self.proc();
+    """
+    A Text class to represent a text you could use with your HTML elements.
+    Because directly using str class was too mainstream.
+    """
+
     def __str__(self):
-        return self.txt;
-    def proc(self):
-        element = "\n<br />\n";
-        self.txt = element.join(self.txt.split('\n'));
-    def isEmpty(self):
-        return self.txt == '';
+        """
+        Do you really need a comment to understand this method?..
+        """
+        return super().__str__().replace('\n', '\n<br />\n')
 
-level = 0;
-class Elem(object):
-    def __init__(self, tag="div", attr={}, content=None, tag_type="double"):
-        self.lvl = 0;
-        self.tag = tag;
-        self.newline = 0;
-        self.tag_type = tag_type;
-        self.setup(content);
-        if isinstance(self.content[0], Elem):
-            self.set_level(self.lvl + 1);
-        # if isinstance(self.content[0], (Elem, Text)):
-        #     self.isInline(self.content[0])
-        
-            
-    def isInline(self, content):
-        if content:
-            self.newline = 1;
-            if isinstance(content, Elem) and content.content:
-                self.content.isInline()
 
-        
+class Elem:
+    """
+    Elem will permit us to represent our HTML elements.
+    """
 
-    def setup(self, content):
-        if not isinstance(content, (None.__class__, list, Elem, Text)):
-            raise Exception("Err");
-        if isinstance(content, list):
-            for c in content:
-                if not (isinstance(c, (Elem, Text))) : raise Exception("Err");
-            self.content = content;
-        else:
-            self.content = [content];
+    class ValidationError(Exception):
+        pass
     
+    
+    
+    def __init__(self, tag='div', attr={}, content=None, tag_type='double'):
+        """
+        __init__() method.
+
+        Obviously.
+        """
+        self.tag = tag
+        self.attr = attr
+        self.content = content if isinstance(content, list) else ([content] if content is not None else [])
+        self.tag_type = tag_type
+        self.lvl = 0
+        for c in self.content:
+            if not self.check_type(c):
+                raise self.ValidationError
+        if self.content:
+            self.set_level(self.lvl)
+
     def set_level(self, lvl):
-        for elem in self.content:
-            elem.lvl = lvl;
-            if elem.content and isinstance(elem.content[0], Elem):
-                elem.set_level(elem.lvl + 1)
-        pass;
+            self.lvl += 1
+            for c in self.content:
+                if (isinstance(c, Elem) and c.content):
+                    c.set_level(c.lvl)
+            pass
     
-    def open_tag(self):
-        str = "%s<%s>%s" % ((self.lvl) * "  ", self.tag, self.newline * '\n');
-        return str
-
-    def generate_content(self):
-        str = ""
-        for elem in self.content:
-            if elem:
-                if isinstance(elem , Text):
-                    str += "%s%s\n" % ((self.lvl + 1 ) * "  ", elem);
-                else:
-                    str += elem.__str__();
-        return str;
-        
     def __str__(self):
-        str = "";
-        str += self.open_tag()
-        str += self.generate_content()
-        str += "%s</%s>%s" % (self.newline * self.lvl * "  ", self.tag, int(0 if self.lvl == 0 else 1) * '\n')
-        return str;
+        """
+        The __str__() method will permit us to make a plain HTML representation
+        of our elements.
+        Make sure it renders everything (tag, attributes, embedded
+        elements...).
+        """
+        result = ''
+        result = "<%s%s>" % (self.tag, self.__make_attr())
+        if self.tag_type == 'double':
+            result += "%s</%s>" % (self.__make_content(), self.tag)
+        elif self.tag_type == 'simple':
+            result = "<%s%s />" % (self.tag, self.__make_attr())
+        return result
 
-print(str(Elem(content=[Text('foo'), Text('bar'), Elem()])) )
+    def __make_attr(self):
+        """
+        Here is a function to render our elements attributes.
+        """
+        result = ''
+        for pair in sorted(self.attr.items()):
+            result += ' ' + str(pair[0]) + '="' + str(pair[1]) + '"'
+        return result
+
+    def __make_content(self):
+        """
+        Here is a method to render the content, including embedded elements.
+        """
+        if not self.content:
+            return ''
+        result = ''
+        if not self.content[0].__str__() == '':
+            result = '\n'
+        for elem in self.content:
+            if (isinstance(elem, Text) and elem.__str__() == ''):
+                result += ''
+            else:
+                tab = 0
+                if isinstance(elem, Elem) and elem.tag_type == 'simple':
+                    tab = 1
+                result += "%s%s\n%s" % ((self.lvl - tab) * '  ' ,str(elem), (self.lvl - 1) * '  ');
+        return result
+
+    def add_content(self, content):
+        if not Elem.check_type(content):
+            raise Elem.ValidationError
+        if type(content) == list:
+            self.content.extend([elem for elem in content if elem != Text('')])
+        elif content != Text(''):
+            self.content.append(content)
+
+    @staticmethod
+    def check_type(content):
+        """
+        Is this object a HTML-compatible Text instance or an Elem, or even a
+        list of both?
+        """
+        return (isinstance(content, Elem) or type(content) == Text or
+                (type(content) == list and all([type(elem) == Text or
+                                                isinstance(elem, Elem)
+                                                for elem in content])))
+
+
+if __name__ == '__main__':
+    # html = Elem(content=Text(''))
+    # print(html)
+    print(str(Elem(tag='html', content=[Elem(tag='head', content=Elem(tag='title', content=Text('"Hello ground!"'))), Elem(tag='body', content=[Elem(tag='h1', content=Text('"Oh no, not again!"')), Elem(tag='img', attr={'src': "http://i.imgur.com/pfp3T.jpg"}, tag_type='simple')])])))
