@@ -1,0 +1,16 @@
+<!-- {% load static %} -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock title %}</title>
+        {% block style %}{% endblock style %}
+    </head>
+    <body id="normal_content">
+        <div>
+            {% include 'ex01/nav.html' %}
+            {% block content %}{% endblock content %}
+        </div>
+    </body>
+    
+</html>
+

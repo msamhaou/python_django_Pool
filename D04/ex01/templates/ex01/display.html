@@ -1,0 +1,25 @@
+{% extends 'ex01/base.html' %}
+{% load static %}
+{% block title %}Ex01: Display process of a static page.{% endblock %}
+{% block style %}<link rel="stylesheet" href="{% static 'ex01/style1.css' %}">{% endblock %}
+
+{%block content %}
+<ol>
+    <li>request: </li>
+        <p>The user's browser sends an HTTP request to the server hosting the website, specifying the URL of the requested page.</p>
+    <li>URL Resolution:</li>
+        <p>Django's url dispatcher match the incoming url from the Http request with the proper view function</p>
+        <p>the Url dispacher figure it out wich view to use trough the urls.py file</p>
+    <li>View Processing :</li>
+        <p>after the url resolved to a proper view function , Django apply the function</p>
+    <li>Template Rendering :</li>
+        <p>if the function is a rendering function , template contains HTML markup along with tags that generate content dynamically </p>
+        <p>Django's template engine processes the template, replacing template tags and variables with their corresponding values.</p>
+    <li>HTTP Response :</li>
+        <p>once template is rendered, Django construct an Http Response contains the Html rendered page</p>
+        <p>the response include a header indicate the content type (usually 'text/html')</p>
+        <p>django sends Http response to the client</p>
+    <li>Client Display :</li>
+        <p>Finally, the client (e.g., web browser) receives the HTTP response and renders the HTML content.</p>
+</ol>
+{% endblock %}
