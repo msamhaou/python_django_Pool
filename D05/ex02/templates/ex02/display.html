@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Ex03</title>
+    </head>
+
+    <style>
+        table, th, td {
+          border:1px solid black;
+        }
+    </style>
+    <body>
+        <table>
+            <tr>
+                <th>episode_nb</th>
+                <th>Title</th>
+                <th>Director</th>
+                <th>Producer</th>
+                <th>Date</th>
+            </tr>
+            {% for movie in movies %}
+            <tr>
+                <th>{{ movie.episode_nb }}</th>
+                <th>{{ movie.title }}</th>
+                <th>{{ movie.director }}</th>
+                <th>{{ movie.producer }}</th>
+                <th>{{ movie.release_date }}</th>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

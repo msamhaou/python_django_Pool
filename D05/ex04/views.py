@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .forms import Delmovie
 import psycopg2
 
 # Create your views here.
@@ -9,7 +10,7 @@ def init(request):
         conn = psycopg2.connect('dbname=mydb user=tahaexo password=secret host=localhost')
         cursor = conn.cursor()
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS ex02_movies(
+            CREATE TABLE IF NOT EXISTS ex04_movies(
                 title VARCHAR(64) UNIQUE NOT NULL,
                 episode_nb SERIAL PRIMARY KEY,
                 opening_crawl Text,
@@ -48,27 +49,33 @@ def Populate(request):
     ]
     dictionaries = set_to_dict(raw_data)
 
-    sql = "INSERT INTO ex02_movies ({}) VALUES ({})".format(
+    sql = "INSERT INTO ex04_movies ({}) VALUES ({})".format(
     ', '.join(dictionaries[0].keys()),
     ', '.join(['%s'] * len(dictionaries[0]))
 )
     try:
         conn = psycopg2.connect('dbname=mydb user=tahaexo password=secret host=localhost')
         cursor = conn.cursor()
-        for data in dictionaries:
-            cursor.execute(sql, list(data.values()))
-            conn.commit()
-        cursor.close()
-        conn.close()
-        return HttpResponse('Ok2')
     except Exception as e:
-        return HttpResponse(f'{e}') 
+        return HttpResponse(f'{e}')
+    result = ''
+    for data in dictionaries:
+        try:
+            cursor.execute(sql, list(data.values()))
+            result += 'OK\n'
+            conn.commit()
+        except Exception as e:
+            result += f'{e}\n'
+            conn.rollback()
+    cursor.close()
+    conn.close()
+    return HttpResponse(result)
 
 def Display(request):
     try:
         conn = psycopg2.connect('dbname=mydb user=tahaexo password=secret host=localhost')
         cursor = conn.cursor()
-        sql = 'SELECT * FROM ex02_movies;'
+        sql = 'SELECT * FROM ex04_movies;'
         cursor.execute(sql)
         movies_data = cursor.fetchall()
         movies = [] 
@@ -78,7 +85,27 @@ def Display(request):
             movies.append(movie_dict)
         cursor.close()
         conn.close()
-        return render(request, 'ex02/display.html', {'movies': movies})
+        return render(request, 'ex04/display.html', {'movies': movies})
     
     except Exception as e:
-        return HttpResponse(f'{e}')  
+        return HttpResponse(f'{e}') 
+    
+def Remove(request):
+    if request.method == 'POST':
+        try:
+            form = Delmovie(request.POST)
+            if form.is_valid():
+                title = form.cleaned_data['title']
+                conn = psycopg2.connect('dbname=mydb user=tahaexo password=secret host=localhost')
+                cursor = conn.cursor()
+                sql = f"Delete from ex04_movies Where title='{title}'"
+                cursor.execute(sql)
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return HttpResponse(f'{title} deleted');
+        except Exception as e:
+            return HttpResponse(f'{e}'); 
+    else:
+        form = Delmovie()
+    return render(request, 'ex04/remove.html', {'form':form})
