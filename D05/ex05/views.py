@@ -26,14 +26,14 @@ def Populate(request):
         'episode_nb: 7 - title: The Force Awakens - director: J. J. Abrams - producer: Kathleen Kennedy, J. J. Abrams, Bryan Burk - release_date: 2015-12-11',
     ]
     dictionaries = set_to_dict(raw_data)
-    results = ''
+    results = []
     for data in dictionaries:
         try:
             Movies.objects.create(**data)
-            results += "OK\n"
+            results.append('OK')
         except Exception as e:
-            results+= (f"{e}\n")
-    return HttpResponse({'results': results})
+            results.append(f'{e}')
+    return render(request, 'ex05/populate.html',{'results':results})
     
 
 def Display(request):
