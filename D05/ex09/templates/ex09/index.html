@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Title</title>
+    </head>
+    <style>
+        table, th, td {
+          border:1px solid black;
+        }
+    </style>
+
+    <body>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>homeworld</th>
+                <th>climate</th>
+            </tr>
+            {% for person in people %}
+            <tr>
+                <th>{{ person.name }}</th>
+                <th>{{ person.homeworld.name }}</th>
+                <th>{{ person.homeworld.climate }}</th>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

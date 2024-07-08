@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html>
+    <title>
+        Ex05
+    </title>
+
+    <body>
+        <form method="post">
+            {% csrf_token %}
+            <label for="movie">Select a movie:</label>
+            <select id="movie" name="movie">
+                {% for movie in movies %}
+                    <option value="{{ movie.title }}">{{ movie.title }}</option>
+                {% endfor %}
+            </select><br><br>
+            
+            <label for="id_opening_crawl">opening_crawl:</label>
+            {{ form.opening_crawl }}
+            <br><br>
+            
+            <input type="submit" value="Update opening_crawl">
+        </form>
+    </body>
+</html>

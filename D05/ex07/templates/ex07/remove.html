@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <title>Ex04 remove</title>
+    </head>
+
+    <body>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Remove</button>
+        </form>
+    </body>
+
+</html>
